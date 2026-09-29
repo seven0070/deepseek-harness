@@ -411,6 +411,7 @@
       "@deepseek-ai/dsh-agent-computer": ["./packages/agent-computer/agent-computer/src"],
       "@deepseek-ai/dsh-subjectivity": ["./packages/autonomy/subjectivity/src"],
       "@deepseek-ai/dsh-autonomy-prompt": ["./packages/autonomy/autonomy-prompt/src"],
+      "@deepseek-ai/dsh-efficiency": ["./packages/autonomy/efficiency/src"],
       "@deepseek-ai/dsh-evolution": ["./packages/autonomy/evolution/src"],
       "@deepseek-ai/dsh-learning": ["./packages/autonomy/learning/src"],
       "@deepseek-ai/dsh-executive": ["./packages/autonomy/executive/src"],

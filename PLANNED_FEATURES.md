@@ -89,7 +89,7 @@ could produce properties associated with machine consciousness, **without assumi
 
 ---
 
-## 8. OpenHuman (tinyhumansai/openhuman) — proposed, not built
+## 8. OpenHuman (tinyhumansai/openhuman) — option B chosen (native re-implementation)
 
 Rust agent harness (desktop/web/TUI + `openhuman-embed` library, headless `openhuman-core` with an HTTP server). **GPL-3.0** — dsh is MIT, so we do **not** copy or vendor its code. Two ways to use it:
 
@@ -102,7 +102,9 @@ Rust agent harness (desktop/web/TUI + `openhuman-embed` library, headless `openh
   5. "Needs confirmation" for consequential browser actions (purchase / send / delete) in agent-computer.
   6. Obsidian-style Markdown mirror of memory (like `guidelines.md`).
 
-Open questions: which of 8a / 8b items first; confirm the OpenHuman RPC surface before building 8a.
+Decision: user chose **option B**. Order: B1, B2, B4 → B3 → B5 → B6. 8a (sidecar) not planned for now.
+
+- [x] B1 tool ranker, B2 compression, B4 run journal + cost → `packages/autonomy/efficiency`
 
 ## Design principle: Open flow
 

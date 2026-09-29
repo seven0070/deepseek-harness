@@ -370,6 +370,7 @@
     { "path": "./packages/agent-computer/agent-computer" },
     { "path": "./packages/autonomy/subjectivity" },
     { "path": "./packages/autonomy/autonomy-prompt" },
+    { "path": "./packages/autonomy/efficiency" },
     { "path": "./packages/autonomy/evolution" },
     { "path": "./packages/autonomy/learning" },
     { "path": "./packages/autonomy/executive" },
