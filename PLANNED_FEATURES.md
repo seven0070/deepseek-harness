@@ -89,6 +89,21 @@ could produce properties associated with machine consciousness, **without assumi
 
 ---
 
+## 8. OpenHuman (tinyhumansai/openhuman) — proposed, not built
+
+Rust agent harness (desktop/web/TUI + `openhuman-embed` library, headless `openhuman-core` with an HTTP server). **GPL-3.0** — dsh is MIT, so we do **not** copy or vendor its code. Two ways to use it:
+
+- **8a. Sidecar bridge (optional plugin `dsh-openhuman`)**: talk to a separately installed, headless `openhuman-core` over its HTTP/RPC API (token auth). Use it as a delegate for what dsh lacks: messaging channels (email, chat apps), meeting join/transcripts, 100+ OAuth integrations, workflows canvas. Every call goes through the dsh authorization gate; turned off by default.
+- **8b. Ideas re-implemented natively in dsh (our own code)**:
+  1. Decision ranker for tool choice — top-k tools by retrieval, then a small calibrated chooser (Jev-style) to cut wrong/needless tool calls; plugs into llm-router.
+  2. Token compression of large tool output / context before it reaches the model.
+  3. Agent-proposed, approval-gated workflows (durable graphs with approval nodes, resume after pause) on top of executive plans + `jobs`/`schedule`.
+  4. Replayable run journals + per-call cost accounting (extends the audit log and budgets).
+  5. "Needs confirmation" for consequential browser actions (purchase / send / delete) in agent-computer.
+  6. Obsidian-style Markdown mirror of memory (like `guidelines.md`).
+
+Open questions: which of 8a / 8b items first; confirm the OpenHuman RPC surface before building 8a.
+
 ## Design principle: Open flow
 
 - Nothing in this plan is final; the full system must remain open for changes.
@@ -101,6 +116,7 @@ could produce properties associated with machine consciousness, **without assumi
 - 2026-09-29: Initial list saved (items 1–5).
 - 2026-09-29: Added Hindsight (item 6) and the open-flow principle.
 - 2026-09-29: Added Helix whole-system evolution (item 7).
+- 2026-09-29: Added OpenHuman (item 8) — proposal only, GPL-3.0 so bridge + native re-implementation of ideas.
 
 ---
 
