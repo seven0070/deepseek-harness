@@ -107,6 +107,7 @@ declare module '@deepseek-ai/cordis' {
 export const name = 'subjectivity'
 
 export interface Config {
+  /** Opt in to the research layer. Off = the plugin does nothing. */
   enabled: boolean
 }
 

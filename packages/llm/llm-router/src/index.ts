@@ -40,9 +40,13 @@ export const name = 'llm-router'
 export const inject = ['llm']
 
 export interface Config {
+  /** Extra environment variable names to inspect for API keys. */
   env: string[]
+  /** Confirm ambiguous key shapes with a read-only listing call. */
   probe: boolean
+  /** Variable name → provider id, bypassing detection. */
   overrides: Record<string, string>
+  /** Also inspect every *_API_KEY variable of the process. */
   scanProcessEnv: boolean
 }
 

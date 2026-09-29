@@ -46,18 +46,33 @@ declare module '@deepseek-ai/cordis' {
 export const name = 'evolution'
 export const inject = ['autonomy']
 
-export interface Gate { name: string, command: string, required?: boolean }
+export interface Gate {
+  /** Label shown in reviews. */
+  name: string
+  /** Shell command; exit code 0 passes. */
+  command: string
+  /** A failing required gate blocks promotion (default true). */
+  required?: boolean
+}
 
 export interface Config {
+  /** Git repository the agent evolves. */
   repoDir: string
+  /** Checks every candidate must pass before it can be promoted. */
   gates: Gate[]
+  /** Lowest evaluator score a candidate needs. */
   minScore: number
+  /** Extra helix.toml keys, passed through. */
   helix: Record<string, TomlValue>
+  /** Longest one evaluation may run, in milliseconds. */
   evaluateTimeoutMs: number
   /** gated: single runs, protected core refused. limitless: endless generations, whole repo mutable, owner approval to promote. */
   mode: 'gated' | 'limitless'
+  /** Default: refuse in gated mode, owner-approval in limitless mode. */
   protectedCore: 'refuse' | 'owner-approval'
+  /** 0 = unlimited (limitless mode). */
   maxGenerations: number
+  /** Pause between generations, in milliseconds. */
   cooldownMs: number
 }
 

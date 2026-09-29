@@ -43,6 +43,9 @@
       "path": "../../schedule/schedule"
     },
     {
+      "path": "../../autonomy/autonomy"
+    },
+    {
       "path": "../../feedback/message-feedback"
     },
     {

@@ -8,15 +8,22 @@
 import { spawn } from 'node:child_process'
 
 export interface RunResult {
+  /** Process exit code; non-zero means failure. */
   code: number
+  /** Captured standard output. */
   stdout: string
+  /** Captured standard error. */
   stderr: string
+  /** Set when the command was killed for running past its timeout. */
   timedOut?: boolean
 }
 
 export interface RunOptions {
+  /** Text written to the command's standard input. */
   input?: string
+  /** Kill the command after this many milliseconds. */
   timeoutMs?: number
+  /** Abort the command early. */
   signal?: AbortSignal
 }
 

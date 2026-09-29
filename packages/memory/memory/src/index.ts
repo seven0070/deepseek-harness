@@ -40,11 +40,17 @@ declare module '@deepseek-ai/cordis' {
 export const name = 'memory'
 
 export interface Config {
+  /** Keep the built-in local store as a floor. */
   local: boolean
+  /** JSON Lines file for the local store; omitted = in-memory only. */
   localPath?: string | undefined
+  /** Folder of Markdown notes (Obsidian-compatible) used as a two-way memory backend. */
   vault?: string | undefined
+  /** Per-backend deadline for one operation. */
   timeoutMs: number
+  /** Backend id → trust multiplier when merging. */
   weights: Record<string, number>
+  /** Expose memory_* tools to the model. */
   tools: boolean
 }
 

@@ -43,10 +43,15 @@ export const name = 'executive'
 export const inject = ['autonomy']
 
 export interface Config {
+  /** JSON file for goals, plans, and beliefs; omitted = in-memory. */
   statePath?: string | undefined
+  /** Work through goals in the background. */
   autorun: boolean
+  /** Pause between working ticks, in milliseconds. */
   intervalMs: number
+  /** Pause after a tick that found nothing to do, in milliseconds. */
   idleMs: number
+  /** Offer the goal, plan and belief tools to the model. */
   tools: boolean
 }
 

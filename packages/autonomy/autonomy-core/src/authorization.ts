@@ -34,6 +34,7 @@ export interface Classification {
 export interface RiskRule {
   /** Glob-ish tool-name pattern: `*` matches any run of characters. */
   action: string
+  /** Risk assigned to matching actions. */
   risk: Risk
   /** Optional substring/regex tested against JSON-serialized args. */
   argsMatch?: string

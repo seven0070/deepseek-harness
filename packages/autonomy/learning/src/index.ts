@@ -49,9 +49,13 @@ export const name = 'learning'
 export const inject = ['autonomy']
 
 export interface Config {
+  /** Where installed skills are written. */
   skillsDir: string
+  /** Where installed scripts are written. */
   scriptsDir: string
+  /** Most trials one experiment may run. */
   maxTrials: number
+  /** Longest one trial may run, in milliseconds. */
   trialTimeoutMs: number
 }
 

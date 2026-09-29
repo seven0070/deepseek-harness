@@ -39,38 +39,64 @@ import * as Memory from '@deepseek-ai/dsh-memory'
 import * as Subjectivity from '@deepseek-ai/dsh-subjectivity'
 import * as Workflows from '@deepseek-ai/dsh-workflows'
 import { join } from 'node:path'
+import { AutonomyControl } from './remote.ts'
 import { makeAgentRunner, makeDelegate, makePlanner } from './brain.ts'
 import type { Complete, ToolInfo } from './brain.ts'
 
 export * from './brain.ts'
+export { AutonomyControl } from './remote.ts'
+export type * from './types.ts'
 
 export const name = 'autonomy-bundle'
 
-type Section = { enabled: boolean } & Record<string, unknown>
+type Section = {
+  /** Mount this part. */
+  enabled: boolean
+} & Record<string, unknown>
 
 export interface Config {
+  /** Shared state folder (identity, audit, memory, goals, guidelines, workflows, journal); omitted = <dsh home>/autonomy inside the app, in-memory elsewhere. */
   stateDir?: string | undefined
   /** Model for planning and delegated steps; omitted = the agent's default model. */
-  model?: { provider: string, model: string } | undefined
+  model?: {
+    /** Provider id, for example `deepseek-official`. */
+    provider: string
+    /** Model id at that provider. */
+    model: string
+  } | undefined
+  /** Work through goals in the background. */
   autorun: boolean
+  /** Tool turns per delegated step. */
   maxTurns: number
+  /** How many ranked tools the planner sees. */
   plannerTools: number
+  /** Safety core config (always mounted). */
   core: Record<string, unknown>
+  /** Memory: local store plus optional backends. */
   memory: Section
+  /** Executive loop config (always mounted). */
   executive: Record<string, unknown>
+  /** Tool search, output compression and the cost journal. */
   efficiency: Section
+  /** Constitution plus learned guidelines in the system prompt. */
   prompt: Section
+  /** Agent-proposed workflows that run after owner review. */
   workflows: Section
+  /** Skill optimisation, experiments and new capabilities. */
   learning: Section
+  /** Sandboxed self-improvement (off by default). */
   evolution: Section
+  /** Research-only measurement layer (off by default). */
   subjectivity: Section
+  /** Serve the web client's Autonomy page (read-only snapshot plus owner decisions). */
+  controlPage: boolean
 }
 
 const section = (enabled: boolean) => z.intersect([z.object({ enabled: z.boolean().default(enabled) }), z.dict(z.any())]).default({ enabled }) as unknown as z<Section>
 
 export const Config: z<Config> = z.object({
-  stateDir: z.string().description('Shared state folder (identity, audit, memory, goals, guidelines, workflows, journal); omitted = in-memory.'),
-  model: z.object({ provider: z.string().required(), model: z.string().required() }).description('Model for planning; default = agent default model.'),
+  stateDir: z.string().description('Shared state folder (identity, audit, memory, goals, guidelines, workflows, journal); omitted = <dsh home>/autonomy inside the app, in-memory elsewhere.'),
+  model: z.object({ provider: z.string(), model: z.string() }).description('Model for planning; default = agent default model.'),
   autorun: z.boolean().default(false).description('Work through goals in the background.'),
   maxTurns: z.natural().default(6).description('Tool turns per delegated step.'),
   plannerTools: z.natural().default(25).description('How many ranked tools the planner sees.'),
@@ -83,6 +109,7 @@ export const Config: z<Config> = z.object({
   learning: section(true),
   evolution: section(false),
   subjectivity: section(false),
+  controlPage: z.boolean().default(true).description('Serve the Autonomy page in the web client.'),
 }) as unknown as z<Config>
 
 interface LlmLike { stream(options: GenerateOptions): AsyncIterable<StreamChunk> }
@@ -104,7 +131,11 @@ export async function collectText(stream: AsyncIterable<StreamChunk>): Promise<s
 const INTERNAL = new Set(['tool_search', 'run_journal'])
 
 export async function apply(ctx: Context, config: Config): Promise<void> {
-  const dir = config.stateDir
+  // Inside the app the Harness home is available: keep state there by default
+  // so goals, memory and the audit log survive restarts. Elsewhere (tests,
+  // embedding) an omitted stateDir stays in-memory.
+  const home = ctx.get('dshHomePath') as ((...segments: string[]) => string) | undefined
+  const dir = config.stateDir ?? home?.('autonomy')
   const at = (file: string) => (dir ? join(dir, file) : undefined)
   const strip = ({ enabled: _, ...rest }: Section) => rest
   const opt = <T extends object>(o: T) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined))
@@ -119,6 +150,7 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
   if (config.learning.enabled) await mount(Learning, strip(config.learning))
   if (config.evolution.enabled) await mount(Evolution, strip(config.evolution))
   if (config.subjectivity.enabled) await mount(Subjectivity, { ...strip(config.subjectivity), enabled: true })
+  if (config.controlPage) await ctx.plugin(AutonomyControl)
 
   // Research measurement: executed steps → agency indicator (read-only feed).
   ctx.inject(['executive', 'subjectivity'], (ctx) => {
@@ -130,7 +162,7 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     const llm = ctx.llm as unknown as LlmLike
     const tools = ctx.tools as unknown as ToolsLike
     const selection = (): { provider: string, model: string } => {
-      if (config.model) return config.model
+      if (config.model?.provider && config.model.model) return { provider: config.model.provider, model: config.model.model }
       const def = ctx.get('agentDefaultModel') as { currentSelection(): { provider: string, model: string } } | undefined
       if (def) return def.currentSelection()
       throw new Error('autonomy: no model configured (set model or agentDefaultModel)')

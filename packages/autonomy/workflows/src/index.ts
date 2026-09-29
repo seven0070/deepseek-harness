@@ -145,7 +145,9 @@ declare module '@deepseek-ai/cordis' {
 export const name = 'workflows'
 
 export interface Config {
+  /** Where workflows and runs persist; omitted = in-memory. */
   dir?: string | undefined
+  /** How often scheduled and delayed runs are checked. */
   tickMs: number
 }
 

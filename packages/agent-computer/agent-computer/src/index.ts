@@ -39,16 +39,27 @@ export const name = 'agent-computer'
 export const inject = ['tools']
 
 export interface Config {
+  /** Agent identity; one computer per name. */
   name: string
+  /** Container engine binary (docker or podman). */
   engine: string
+  /** Image for the shell computer. */
   image: string
+  /** Run a desktop reachable at 127.0.0.1:desktopPort. */
   desktop: boolean
+  /** Image used when the desktop is on. */
   desktopImage: string
+  /** Host port for the desktop's web view (bound to 127.0.0.1 only). */
   desktopPort: number
+  /** Container network mode; `none` cuts the computer off from the network. */
   network: string
+  /** CPU limit, in cores. */
   cpus: number
+  /** Memory limit in engine syntax, for example `4g`. */
   memory: string
+  /** Longest a single command may run before it is killed, in milliseconds. */
   execTimeoutMs: number
+  /** Expose snapshot restore to the model. */
   modelRestore: boolean
   /** Test seam; not part of the persisted schema. */
   runner?: CommandRunner

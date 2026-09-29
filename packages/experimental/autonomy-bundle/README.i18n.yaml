@@ -1,0 +1,46 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/experimental/autonomy-bundle/README.md
+/:
+  en: 6df8a3f0e4f02ddd
+  zh: 58b51489f108ff98
+/deepseek-ai-dsh-experimental-autonomy-bundle:
+  en: 4f487c5776a4f606
+  zh: db35bc506d1eeba3
+/deepseek-ai-dsh-experimental-autonomy-bundle/summary:
+  en: 358d807db2549892
+  zh: 3619bb068213f7ec
+/deepseek-ai-dsh-experimental-autonomy-bundle/table-of-contents:
+  en: d152484eb41ac6b4
+  zh: 405b30feaf48c087
+/deepseek-ai-dsh-experimental-autonomy-bundle/use-this-package:
+  en: 7f93cdd86c06e89c
+  zh: d450cefc7e0576bb
+/deepseek-ai-dsh-experimental-autonomy-bundle/understand-the-implementation:
+  en: eb196b4c5902168a
+  zh: f9c37ff9b11804a0
+/deepseek-ai-dsh-experimental-autonomy-bundle/further-exploration:
+  en: a0f6cd1e82564787
+  zh: 5614460b319a74d4
+/deepseek-ai-dsh-experimental-autonomy-bundle/model-experience:
+  en: 215e7ba838619b7b
+  zh: a311da3843709f90
+/deepseek-ai-dsh-experimental-autonomy-bundle/model-experience/autonomy-tools-and-prompt:
+  en: cfd594fc8a3016aa
+  zh: b36e3c446292fc82
+/deepseek-ai-dsh-experimental-autonomy-bundle/model-experience/autonomy-tools-and-prompt/what-the-model-sees:
+  en: 6536c5b8ca735bdc
+  zh: 353c763262e2d55d
+/deepseek-ai-dsh-experimental-autonomy-bundle/model-experience/autonomy-tools-and-prompt/token-effect:
+  en: 7a97c068f217b1d6
+  zh: 1272e0e46111e00a
+/deepseek-ai-dsh-experimental-autonomy-bundle/model-experience/autonomy-tools-and-prompt/kv-cache-effect:
+  en: 5c35b7e85e3c9344
+  zh: afae560e063b4b3f
+/deepseek-ai-dsh-experimental-autonomy-bundle/known-limitations-and-deferred-work:
+  en: 29f71bb227bddb41
+  zh: 2a5b4d6fc6fc3ac3
+/deepseek-ai-dsh-experimental-autonomy-bundle/known-limitations-and-deferred-work/dev-note:
+  en: 0225ba087c5266f3
+  zh: 0400e21a2683a23c

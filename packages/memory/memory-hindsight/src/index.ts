@@ -25,9 +25,13 @@ export const name = 'memory-hindsight'
 export const inject = ['memory']
 
 export interface Config {
+  /** Hindsight server URL. */
   baseUrl: string
+  /** Memory bank; one per agent identity. */
   bank: string
+  /** Namespace that holds the bank. */
   namespace: string
+  /** Environment variable holding a Hindsight Cloud API key. */
   apiKeyEnv?: string | undefined
   /** Test seam. */
   fetch?: FetchLike | undefined

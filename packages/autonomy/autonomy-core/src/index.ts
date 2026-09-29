@@ -71,15 +71,25 @@ declare module '@deepseek-ai/cordis' {
 export const name = 'autonomy-core'
 
 export interface Config {
+  /** Agent name used on first start, before an identity is stored. */
   name: string
+  /** Where identity and audit persist; omitted = in-memory. */
   stateDir?: string | undefined
+  /** Highest risk that proceeds without asking. */
   autoApprove: Risk
+  /** host: interactive approval prompt; queue: background approval queue; deny: refuse. */
   approval: 'host' | 'queue' | 'deny'
+  /** How long a queued approval waits before it counts as denied, in milliseconds. */
   approvalTimeoutMs: number
+  /** Spending caps per window: actions, tokens, dollars, wall-clock time. */
   budget: BudgetLimits
+  /** Length of the rolling budget window, in milliseconds. */
   budgetWindowMs: number
+  /** Extra risk rules, checked before the built-in ones. */
   extraRules: RiskRule[]
+  /** Extra path patterns the agent may never change. */
   extraProtected: string[]
+  /** Route every tool call through the authorization gate. */
   gateTools: boolean
 }
 

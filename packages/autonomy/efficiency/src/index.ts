@@ -59,9 +59,35 @@ declare module '@deepseek-ai/cordis' {
 export const name = 'efficiency'
 
 export interface Config {
-  toolSearch: { enabled: boolean, k: number, threshold: number }
-  compression: { enabled: boolean, tools: string[], minChars: number, maxChars: number }
-  journal: { enabled: boolean, path?: string | undefined, prices: Record<string, Price> }
+  /** Ranked tool search with calibrated probabilities (`tool_search`). */
+  toolSearch: {
+    /** Offer the `tool_search` tool. */
+    enabled: boolean
+    /** How many tools a search returns. */
+    k: number
+    /** Below this top probability the answer is "no tool needed". */
+    threshold: number
+  }
+  /** Shrinking long output from noisy tools before the model sees it. */
+  compression: {
+    /** Compress output at all. */
+    enabled: boolean
+    /** Tool-name patterns whose output may be compressed; file reads never are. */
+    tools: string[]
+    /** Output shorter than this is left alone, in characters. */
+    minChars: number
+    /** Target length after compression, in characters. */
+    maxChars: number
+  }
+  /** Replayable journal of model and tool calls with per-call cost. */
+  journal: {
+    /** Record the journal. */
+    enabled: boolean
+    /** JSONL file the journal appends to; omitted = in-memory. */
+    path?: string | undefined
+    /** Dollar prices per million tokens, keyed by model pattern (for example `deepseek-*`). */
+    prices: Record<string, Price>
+  }
 }
 
 const price = z.object({ input: z.number().required(), output: z.number().required(), cacheRead: z.number() })

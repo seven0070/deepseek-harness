@@ -54,7 +54,9 @@ export interface Config {
    * your approval (prompt_propose, high risk).
    */
   changes: 'open' | 'approve'
+  /** Most guidelines kept; the oldest unpinned ones drop off first. */
   maxGuidelines: number
+  /** Longest single guideline, in characters. */
   maxChars: number
 }
 

@@ -30,10 +30,15 @@ export const inject = ['memory']
 export type SearchType = 'GRAPH_COMPLETION' | 'RAG_COMPLETION' | 'CHUNKS' | 'SUMMARIES' | 'INSIGHTS'
 
 export interface Config {
+  /** Cognee server URL, without the `/api/v1` prefix. */
   baseUrl: string
+  /** Cognee dataset; one per agent identity. */
   dataset: string
+  /** Environment variable holding a Cognee Cloud API key. */
   apiKeyEnv?: string | undefined
+  /** Cognee search mode used for recall. */
   recallSearchType: SearchType
+  /** Batch retains before building the graph. */
   cognifyDebounceMs: number
   /** Test seam. */
   fetch?: FetchLike | undefined

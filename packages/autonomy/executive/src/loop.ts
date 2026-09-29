@@ -97,6 +97,11 @@ export class ExecutiveLoop {
     return () => this.stepListeners.delete(listener)
   }
 
+  /** Persist the current state (e.g. after an owner decision made outside a tick). */
+  save(): Promise<void> {
+    return this.checkpoint()
+  }
+
   toJSON(): ExecutiveState {
     return { goals: this.goals.toJSON(), world: this.world.toJSON(), plans: Object.fromEntries(this.plans), ticks: this.ticks }
   }
