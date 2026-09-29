@@ -63,6 +63,9 @@ export const DEFAULT_RULES: readonly RiskRule[] = [
   { action: 'evolution_status', risk: 'read' }, { action: 'evolution_review', risk: 'low' },
   { action: 'evolution_start', risk: 'high' }, { action: 'evolution_rollback', risk: 'high' },
   { action: 'evolution_autorun', risk: 'high' },
+  { action: 'workflow_status', risk: 'read' }, { action: 'workflow_propose', risk: 'low' }, { action: 'workflow_disable', risk: 'low' },
+  { action: 'workflow_run', risk: 'medium' }, { action: 'workflow_activate', risk: 'high' }, { action: 'workflow_approve', risk: 'high' },
+  { action: 'tool_search', risk: 'read' }, { action: 'run_journal', risk: 'read' },
   { action: 'prompt_guidelines', risk: 'read' }, { action: 'prompt_edit', risk: 'low' }, { action: 'prompt_propose', risk: 'high' }, { action: 'prompt_revert', risk: 'high' },
   { action: 'evolution_promote', risk: 'critical' },
 ]

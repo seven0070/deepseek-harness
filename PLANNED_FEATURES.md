@@ -105,6 +105,7 @@ Rust agent harness (desktop/web/TUI + `openhuman-embed` library, headless `openh
 Decision: user chose **option B**. Order: B1, B2, B4 → B3 → B5 → B6. 8a (sidecar) not planned for now.
 
 - [x] B1 tool ranker, B2 compression, B4 run journal + cost → `packages/autonomy/efficiency`
+- [x] B3 agent-proposed, owner-activated durable workflows → `packages/autonomy/workflows`
 
 ## Design principle: Open flow
 
