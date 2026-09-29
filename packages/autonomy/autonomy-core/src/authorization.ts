@@ -60,6 +60,8 @@ export const DEFAULT_RULES: readonly RiskRule[] = [
   { action: 'bash', risk: 'high', argsMatch: '\\brm\\s+-rf\\b|\\bsudo\\b|\\bmkfs\\b|\\bdd\\s+if=|curl[^|]*\\|\\s*(ba)?sh|git\\s+push\\s+(-f|--force)' },
   { action: 'bash', risk: 'medium' },
   { action: 'skill_promote', risk: 'high' }, { action: 'capability_install', risk: 'high' },
+  { action: 'evolution_status', risk: 'read' }, { action: 'evolution_review', risk: 'low' },
+  { action: 'evolution_start', risk: 'high' }, { action: 'evolution_rollback', risk: 'high' },
   { action: 'evolution_promote', risk: 'critical' },
 ]
 
