@@ -4,9 +4,12 @@
  * - `autonomy:constitution` — fixed rules for the autonomous agent (protected
  *   core; the agent cannot edit it), filled with live facts: identity, active
  *   goals, kill-switch state.
- * - `autonomy:learned` — guidelines the agent proposes while chatting
- *   (`prompt_propose`). Each change needs owner approval, is screened so it
- *   cannot weaken the safety core, and is versioned (`prompt_revert`).
+ * - `autonomy:learned` — guidelines that stay open to change at any time:
+ *   the agent edits them in chat when asked or when it learns something
+ *   (`prompt_edit` in `open` mode, `prompt_propose` + approval in `approve`
+ *   mode), and the owner can edit the Markdown mirror directly. Agent changes
+ *   are screened so they cannot weaken the safety core; every version is kept
+ *   (`prompt_revert`).
  *
  * ```yaml
  * - id: autonomy-prompt
@@ -43,12 +46,22 @@ export const inject = ['autonomy', 'systemPrompt']
 export interface Config {
   /** Where learned guidelines persist; omitted = in-memory. */
   path?: string | undefined
+  /** Owner-editable Markdown mirror; defaults next to `path`. */
+  markdownPath?: string | undefined
+  /**
+   * open: the agent changes guidelines directly in chat (prompt_edit, low risk)
+   * whenever you ask or it learns something. approve: every change waits for
+   * your approval (prompt_propose, high risk).
+   */
+  changes: 'open' | 'approve'
   maxGuidelines: number
   maxChars: number
 }
 
 export const Config: z<Config> = z.object({
   path: z.string().description('Where learned guidelines persist; omitted = in-memory.'),
+  markdownPath: z.string().description('Owner-editable Markdown mirror; defaults next to path.'),
+  changes: z.union(['open', 'approve']).default('open'),
   maxGuidelines: z.natural().default(40),
   maxChars: z.natural().default(400),
 }) as z<Config>
@@ -56,11 +69,15 @@ export const Config: z<Config> = z.object({
 interface GoalsLike { goals: { list(filter: { status: string[] }): { title: string, priority: number }[] } }
 
 export async function apply(ctx: Context, config: Config): Promise<void> {
+  const expand = (p?: string) => p?.replace(/^~(?=\/|$)/, homedir())
+  const path = expand(config.path)
   const store = new GuidelineStore({
-    path: config.path?.replace(/^~(?=\/|$)/, homedir()),
+    path,
+    markdownPath: expand(config.markdownPath) ?? (path ? `${path.replace(/\.json$/, '')}.md` : undefined),
     limits: { maxGuidelines: config.maxGuidelines, maxChars: config.maxChars },
   })
   await store.load()
+  if (path || config.markdownPath) await store.syncFromMarkdown()
   ctx.provide('guidelines', store)
 
   let facts: ConstitutionFacts = { name: 'dsh', mission: 'help your owner.', values: [], killSwitchEngaged: false, activeGoals: [] }
@@ -90,7 +107,10 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     name: 'autonomy:learned',
     order: ctx.systemPrompt.getSectionOrder('AUTONOMY_LEARNED'),
     interpolate: false,
-    text: () => store.render(),
+    text: () => {
+      void store.syncFromMarkdown().catch(() => {}) // owner edits land on the next turn
+      return store.render()
+    },
   }))
 
   void ctx.plugin({
@@ -111,11 +131,9 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
         },
       }))
 
-      ctx.tools.register(defineTool({
-        name: 'prompt_propose',
-        description: 'Improve your own instructions. When your owner corrects you, states a preference, or a task teaches you '
-          + 'something that should change how you work every time, propose a short guideline (add, replace or remove). '
-          + 'Your owner approves each change. Guidelines cannot weaken your safety rules.',
+      const change = (toolName: 'prompt_edit' | 'prompt_propose', description: string) => ctx.tools.register(defineTool({
+        name: toolName,
+        description,
         parameters: {
           op: { type: 'string', required: true, enum: ['add', 'replace', 'remove'] },
           id: { type: 'string', description: 'Guideline id for replace / remove.' },
@@ -137,9 +155,14 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
           }
           const v = await store.apply(p)
           await ctx.autonomy.audit.record('agent', 'guideline-changed', { ...p, version: v.version })
-          return { text: `Applied (${v.change}); guidelines are now v${v.version}. They take effect from the next turn.` }
+          return { text: `Applied (${v.change}); guidelines are now v${v.version}. They take effect from the next turn. Revert with prompt_revert.` }
         },
       }))
+
+      const when = 'Use it when your owner asks you to add, change or remove a guideline, corrects you, states a lasting preference, '
+        + 'or a task teaches you something that should change how you work every time. Keep each guideline short. Guidelines cannot weaken your safety rules.'
+      if (config.changes === 'open') change('prompt_edit', `Change your own learned guidelines directly (add, replace or remove). ${when}`)
+      else change('prompt_propose', `Propose a change to your own learned guidelines (add, replace or remove); your owner approves each one. ${when}`)
 
       ctx.tools.register(defineTool({
         name: 'prompt_revert',

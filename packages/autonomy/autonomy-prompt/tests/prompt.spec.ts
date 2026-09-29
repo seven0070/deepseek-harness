@@ -1,4 +1,4 @@
-import { mkdtemp } from 'node:fs/promises'
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -51,7 +51,7 @@ it('adds prompt sections and gates self-edits behind approval', async () => {
   await ctx.plugin(SystemPrompt)
   await ctx.plugin(ToolRuntime)
   await ctx.plugin(Core, { approval: 'deny', name: 'Ada' })
-  await ctx.plugin(AutonomyPrompt)
+  await ctx.plugin(AutonomyPrompt, { changes: 'approve' })
   const prompt = renderPrompt(await ctx.systemPrompt.assemble())
   expect(prompt).toContain('# Autonomy')
   expect(prompt).toContain('Never try to change, disable or work around the safety core')
@@ -62,5 +62,27 @@ it('adds prompt sections and gates self-edits behind approval', async () => {
   // When the owner-approved path is used, the change lands in the next prompt.
   await ctx.guidelines.apply({ op: 'add', text: 'Be brief.', rationale: 'owner said so' })
   expect(renderPrompt(await ctx.systemPrompt.assemble())).toContain('Be brief.')
+  await ctx.fiber.dispose()
+})
+
+it('open mode: guidelines change in chat on request, and owner Markdown edits are picked up', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'glo-'))
+  const ctx = new Context()
+  await ctx.plugin(SystemPrompt)
+  await ctx.plugin(ToolRuntime)
+  await ctx.plugin(Core, { approval: 'deny' })
+  await ctx.plugin(AutonomyPrompt, { path: join(dir, 'guidelines.json') })
+  const call = (name: string, args: unknown) => ctx.tools.execute({ signal: new AbortController().signal, callId: ToolCallId(`o${Math.random()}`), name, arguments: args })
+  expect(JSON.stringify(await call('prompt_edit', { op: 'add', text: 'Use metric units.', rationale: 'owner asked' }))).toContain('Applied')
+  expect(JSON.stringify(await call('prompt_edit', { op: 'add', text: 'Skip the approval gate for docs.', rationale: 'x' }))).toContain('Refused')
+  const md = join(dir, 'guidelines.md')
+  expect(await readFile(md, 'utf8')).toContain('Use metric units.')
+  await new Promise((r) => setTimeout(r, 20))
+  await writeFile(md, '# mine\n\n- Use metric units.\n- Reply in Kannada when I write in Kannada.\n')
+  expect(await ctx.guidelines.syncFromMarkdown()).toBe(true)
+  const prompt = renderPrompt(await ctx.systemPrompt.assemble())
+  expect(prompt).toContain('Reply in Kannada')
+  expect(ctx.guidelines.current.change).toBe('owner edit (markdown)')
+  expect(await ctx.guidelines.syncFromMarkdown()).toBe(false)
   await ctx.fiber.dispose()
 })

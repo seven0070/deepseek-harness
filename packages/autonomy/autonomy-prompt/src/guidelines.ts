@@ -1,6 +1,8 @@
 /**
  * Learned guidelines: the part of the prompt the agent builds itself while
- * chatting. The agent proposes a guideline (add / replace / remove) with a
+ * chatting — and that stays open to change at any time, by the agent in chat
+ * (owner-approved or, in `open` mode, immediately) or by the owner editing the
+ * Markdown mirror directly. The agent proposes a guideline (add / replace / remove) with a
  * rationale — usually after a correction from its owner or a lesson from a
  * task. Proposing is a high-risk intent, so each change is applied only when
  * the owner approves it. Every version is kept and can be reverted.
@@ -11,7 +13,7 @@
  * @module dsh-autonomy-prompt/guidelines
  */
 import { randomUUID } from 'node:crypto'
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
 
 export interface Guideline {
@@ -62,7 +64,49 @@ export type Proposal =
 export class GuidelineStore {
   private versions: GuidelineVersion[] = [{ version: 0, guidelines: [], change: 'initial', at: new Date(0).toISOString() }]
 
-  constructor(private readonly options: { path?: string | undefined, limits?: Partial<GuidelineLimits>, now?: () => Date } = {}) {}
+  private markdownMtime = 0
+
+  constructor(private readonly options: {
+    path?: string | undefined
+    /** Owner-editable Markdown mirror (`- [id] text` per line); edits are picked up automatically. */
+    markdownPath?: string | undefined
+    limits?: Partial<GuidelineLimits>
+    now?: () => Date
+  } = {}) {}
+
+  /**
+   * Pick up owner edits to the Markdown file. Owner edits are trusted (no
+   * safety screen) but still respect the size limits. Returns true if a new
+   * version was created.
+   */
+  async syncFromMarkdown(): Promise<boolean> {
+    const path = this.options.markdownPath
+    if (!path) return false
+    let mtime: number
+    try { mtime = (await stat(path)).mtimeMs } catch { return false }
+    if (mtime === this.markdownMtime) return false
+    this.markdownMtime = mtime
+    const text = await readFile(path, 'utf8')
+    const now = (this.options.now?.() ?? new Date()).toISOString()
+    const byId = new Map(this.current.guidelines.map((g) => [g.id, g]))
+    const parsed: Guideline[] = []
+    for (const line of text.split('\n')) {
+      const m = /^\s*[-*]\s+(?:\[([\w-]+)\]\s*)?(.+?)\s*$/.exec(line)
+      if (!m) continue
+      const body = m[2]!.slice(0, this.limits.maxChars)
+      const prev = m[1] ? byId.get(m[1]) : undefined
+      parsed.push(prev && prev.text === body ? prev : { id: prev?.id ?? m[1] ?? randomUUID().slice(0, 6), text: body, rationale: 'edited by owner', source: 'owner edit', createdAt: now })
+    }
+    const next = parsed.slice(0, this.limits.maxGuidelines)
+    const same = next.length === this.current.guidelines.length && next.every((g, i) => g === this.current.guidelines[i])
+    if (same) return false
+    await this.push(next, 'owner edit (markdown)', now)
+    return true
+  }
+
+  renderMarkdown(): string {
+    return `# Learned guidelines\n\n<!-- Edit freely: one \"- [id] text\" per line. Lines without an id become new guidelines. Changes apply on the next turn. -->\n\n${this.current.guidelines.map((g) => `- [${g.id}] ${g.text}`).join('\n')}\n`
+  }
 
   get limits(): GuidelineLimits {
     return { maxGuidelines: 40, maxChars: 400, ...this.options.limits }
@@ -133,6 +177,11 @@ ${list.map((g) => `- [${g.id}] ${g.text}`).join('\n')}`
     if (this.options.path) {
       await mkdir(dirname(this.options.path), { recursive: true })
       await writeFile(this.options.path, JSON.stringify(this.versions, null, 2))
+    }
+    if (this.options.markdownPath) {
+      await mkdir(dirname(this.options.markdownPath), { recursive: true })
+      await writeFile(this.options.markdownPath, this.renderMarkdown())
+      this.markdownMtime = (await stat(this.options.markdownPath)).mtimeMs
     }
     return v
   }
