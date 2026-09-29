@@ -1,0 +1,39 @@
+# Optional memory engines for @deepseek-ai/dsh-memory-hindsight and
+# @deepseek-ai/dsh-memory-cognee. The harness works without them (the local
+# store in @deepseek-ai/dsh-memory is the floor).
+#
+#   docker compose -f services/memory/docker-compose.yml up -d
+#
+# Both engines call an LLM to extract facts / build graphs; set the keys below.
+# Image names and variable names follow each project's docs as of 2026-09 —
+# check upstream if a pull fails:
+#   https://github.com/vectorize-io/hindsight   https://github.com/topoteretes/cognee
+services:
+  hindsight:
+    image: ghcr.io/vectorize-io/hindsight:latest
+    ports:
+      - "127.0.0.1:8888:8888"   # API
+      - "127.0.0.1:9999:9999"   # control-plane UI
+    environment:
+      HINDSIGHT_API_LLM_PROVIDER: ${HINDSIGHT_LLM_PROVIDER:-openai}
+      HINDSIGHT_API_LLM_API_KEY: ${HINDSIGHT_LLM_API_KEY:-${OPENAI_API_KEY:-}}
+      HINDSIGHT_API_LLM_MODEL: ${HINDSIGHT_LLM_MODEL:-gpt-5-mini}
+    volumes:
+      - hindsight-data:/home/hindsight/.pg0
+    restart: unless-stopped
+
+  cognee:
+    image: cognee/cognee:main
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      LLM_API_KEY: ${COGNEE_LLM_API_KEY:-${OPENAI_API_KEY:-}}
+      LLM_MODEL: ${COGNEE_LLM_MODEL:-gpt-5-mini}
+      REQUIRE_AUTHENTICATION: "false"
+    volumes:
+      - cognee-data:/app/cognee/.cognee_system
+    restart: unless-stopped
+
+volumes:
+  hindsight-data:
+  cognee-data:
