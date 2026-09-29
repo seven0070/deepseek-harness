@@ -1,6 +1,6 @@
 # Planned Features
 
-> Status: **BUILD APPROVED (2026-09-29)**. Phases 1–6 complete; later phases proceed in order.
+> Status: **BUILD APPROVED (2026-09-29)**. Phases 1–7 complete; later phases proceed in order.
 > **Open flow:** this whole plan stays open to changes — any item can be added, edited, reordered, or removed at any time, including during/after build.
 > Next step: planning (design + mapping onto existing `packages/`), then build on request.
 
@@ -137,4 +137,4 @@ could produce properties associated with machine consciousness, **without assumi
 - [x] **Phase 4 — Executive core**: `packages/autonomy/autonomy-core` (identity + versioned self-model, risk-classified authorization gate on every tool call, approval queue, protected immutable core, budgets, kill switch incl. `STOP` file, hash-chained audit log) and `packages/autonomy/executive` (goal hierarchy, world model with log-odds beliefs/decay/calibration, plan DAGs, verification checks, retries + circuit breaker, autonomous loop with memory recall/retain; goal_/plan_/belief_ tools).
 - [x] **Phase 5 — Learning**: `packages/autonomy/learning` (SkillOpt-style validation-gated skill optimizer + upstream CLI bridge, statistical `experiment_run` on the agent computer, propose → test → owner-approved install pipeline for new skills/scripts).
 - [x] **Phase 6 — Evolution**: `packages/autonomy/evolution` (Helix bridge: helix.toml + gate evaluator emitting HELIX_RESULT, background runs on helix/* branches, protected-core diff check, fresh-worktree re-evaluation, critical-risk owner-approved merge, revert rollback).
-- [ ] Phase 7 — Subjectivity research layer
+- [x] **Phase 7 — Subjectivity research layer**: `packages/autonomy/subjectivity` (opt-in, off by default, measurement-only; metacognition calibration, self-model stability, global-workspace availability, agency indicators; every report disclaims any consciousness claim).
