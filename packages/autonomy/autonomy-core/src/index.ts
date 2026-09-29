@@ -48,6 +48,11 @@ export interface AutonomyCore {
   killSwitch: KillSwitch
   approvals: ApprovalQueue
   policy: AuthorizationPolicy
+  /**
+   * Mark one tool call id as already authorized (by {@link authorize} with
+   * `interactive: false`) so the tool gate does not ask a second time.
+   */
+  preAuthorize(callId: string): void
   /** Run an intent through the full gate. Used by tools and by the executive loop. */
   authorize(intent: Intent, options?: { signal?: AbortSignal, interactive?: boolean }): Promise<AuthorizationResult>
 }
@@ -99,7 +104,7 @@ export const Config: z<Config> = z.object({
   gateTools: z.boolean().default(true).description('Route every tool call through the authorization gate.'),
 }) as z<Config>
 
-export function createAutonomyCore(config: Config): AutonomyCore {
+export function createAutonomyCore(config: Config): AutonomyCore & { consumePreAuthorization(callId: string): boolean } {
   const dir = config.stateDir?.replace(/^~(?=\/|$)/, homedir())
   const identity = new IdentityStore({ path: dir && join(dir, 'identity.json'), name: config.name })
   const audit = new AuditLog({ path: dir && join(dir, 'audit.jsonl') })
@@ -162,7 +167,11 @@ export function createAutonomyCore(config: Config): AutonomyCore {
     void audit.record('owner', 'kill-switch', { reason: killSwitch.reason })
   })
 
-  return { identity, audit, budget, killSwitch, approvals, policy, authorize }
+  const preAuthorized = new Set<string>()
+  const preAuthorize = (callId: string): void => { preAuthorized.add(callId) }
+  const consumePreAuthorization = (callId: string): boolean => preAuthorized.delete(callId)
+
+  return Object.assign({ identity, audit, budget, killSwitch, approvals, policy, authorize, preAuthorize }, { consumePreAuthorization })
 }
 
 export function apply(ctx: Context, config: Config): void {
@@ -171,6 +180,8 @@ export function apply(ctx: Context, config: Config): void {
 
   if (config.gateTools) {
     ctx.on('tools/pre-execute', async (exec, next): Promise<PreToolDecision> => {
+      // The kill switch still wins over a pre-authorization.
+      if (!core.killSwitch.engaged && core.consumePreAuthorization(String(exec.callId))) return next()
       const result = await core.authorize({ action: exec.name, args: exec.arguments }, { signal: exec.signal })
       if (result.allowed === true) return next()
       if (result.allowed === 'ask') {

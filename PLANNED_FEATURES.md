@@ -1,6 +1,6 @@
 # Planned Features
 
-> Status: **BUILD APPROVED (2026-09-29)**. Phases 1–3 complete; later phases proceed in order.
+> Status: **BUILD APPROVED (2026-09-29)**. Phases 1–4 complete; later phases proceed in order.
 > **Open flow:** this whole plan stays open to changes — any item can be added, edited, reordered, or removed at any time, including during/after build.
 > Next step: planning (design + mapping onto existing `packages/`), then build on request.
 
@@ -134,7 +134,7 @@ could produce properties associated with machine consciousness, **without assumi
 - [x] **Phase 1 — Universal model router**: `packages/llm/llm-router` (key detection rules, env-name hints, read-only probing, env scanning, pi-ai route mounting, policy routing; 25 tests).
 - [x] **Phase 2 — Agent's own computer**: `packages/agent-computer/agent-computer` (persistent Docker/Podman machine, volume-backed home, optional loopback desktop, system+disk snapshots/restore, 5–6 model tools, `ctx.agentComputer` service; 12 tests).
 - [x] **Phase 3 — Memory**: `packages/memory/{memory,memory-hindsight,memory-cognee}` (`ctx.memory` fan-out/merge service with graceful degradation, local BM25 store, memory_retain/recall/reflect tools, Hindsight + Cognee REST backends, `services/memory/docker-compose.yml`; 13 tests).
-- [ ] Phase 4 — Executive core
+- [x] **Phase 4 — Executive core**: `packages/autonomy/autonomy-core` (identity + versioned self-model, risk-classified authorization gate on every tool call, approval queue, protected immutable core, budgets, kill switch incl. `STOP` file, hash-chained audit log) and `packages/autonomy/executive` (goal hierarchy, world model with log-odds beliefs/decay/calibration, plan DAGs, verification checks, retries + circuit breaker, autonomous loop with memory recall/retain; goal_/plan_/belief_ tools).
 - [ ] Phase 5 — Learning (SkillOpt)
 - [ ] Phase 6 — Evolution (Helix)
 - [ ] Phase 7 — Subjectivity research layer

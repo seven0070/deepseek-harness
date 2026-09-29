@@ -368,6 +368,7 @@
     { "path": "./packages/llm/llm-deepseek-api-key" },
     { "path": "./packages/llm/llm-router" },
     { "path": "./packages/agent-computer/agent-computer" },
+    { "path": "./packages/autonomy/executive" },
     { "path": "./packages/autonomy/autonomy-core" },
     { "path": "./packages/memory/memory" },
     { "path": "./packages/memory/memory-hindsight" },

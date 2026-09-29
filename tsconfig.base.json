@@ -409,6 +409,7 @@
       "@deepseek-ai/dsh-llm-deepseek-api-key": ["./packages/llm/llm-deepseek-api-key/src"],
       "@deepseek-ai/dsh-llm-router": ["./packages/llm/llm-router/src"],
       "@deepseek-ai/dsh-agent-computer": ["./packages/agent-computer/agent-computer/src"],
+      "@deepseek-ai/dsh-executive": ["./packages/autonomy/executive/src"],
       "@deepseek-ai/dsh-autonomy-core": ["./packages/autonomy/autonomy-core/src"],
       "@deepseek-ai/dsh-memory": ["./packages/memory/memory/src"],
       "@deepseek-ai/dsh-memory-hindsight": ["./packages/memory/memory-hindsight/src"],
