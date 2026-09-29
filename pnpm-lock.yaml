@@ -1656,6 +1656,52 @@ importers:
         specifier: workspace:*
         version: link:../../util/home-paths
 
+  packages/autonomy/autonomy:
+    dependencies:
+      '@deepseek-ai/dsh-autonomy-core':
+        specifier: workspace:*
+        version: link:../autonomy-core
+      '@deepseek-ai/dsh-autonomy-prompt':
+        specifier: workspace:*
+        version: link:../autonomy-prompt
+      '@deepseek-ai/dsh-efficiency':
+        specifier: workspace:*
+        version: link:../efficiency
+      '@deepseek-ai/dsh-evolution':
+        specifier: workspace:*
+        version: link:../evolution
+      '@deepseek-ai/dsh-executive':
+        specifier: workspace:*
+        version: link:../executive
+      '@deepseek-ai/dsh-learning':
+        specifier: workspace:*
+        version: link:../learning
+      '@deepseek-ai/dsh-memory':
+        specifier: workspace:*
+        version: link:../../memory/memory
+      '@deepseek-ai/dsh-subjectivity':
+        specifier: workspace:*
+        version: link:../subjectivity
+      '@deepseek-ai/dsh-workflows':
+        specifier: workspace:*
+        version: link:../workflows
+      '@deepseek-ai/schemastery':
+        specifier: link:../../../vendor/schemastery
+        version: link:../../../vendor/schemastery
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-llm':
+        specifier: workspace:*
+        version: link:../../llm/llm
+      '@deepseek-ai/dsh-system-prompt':
+        specifier: workspace:*
+        version: link:../../core/system-prompt
+      '@deepseek-ai/dsh-tools':
+        specifier: workspace:*
+        version: link:../../core/tools
+
   packages/autonomy/autonomy-core:
     dependencies:
       '@deepseek-ai/schemastery':

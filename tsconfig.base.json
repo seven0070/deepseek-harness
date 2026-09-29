@@ -413,6 +413,7 @@
       "@deepseek-ai/dsh-autonomy-prompt": ["./packages/autonomy/autonomy-prompt/src"],
       "@deepseek-ai/dsh-efficiency": ["./packages/autonomy/efficiency/src"],
       "@deepseek-ai/dsh-workflows": ["./packages/autonomy/workflows/src"],
+      "@deepseek-ai/dsh-autonomy": ["./packages/autonomy/autonomy/src"],
       "@deepseek-ai/dsh-evolution": ["./packages/autonomy/evolution/src"],
       "@deepseek-ai/dsh-learning": ["./packages/autonomy/learning/src"],
       "@deepseek-ai/dsh-executive": ["./packages/autonomy/executive/src"],

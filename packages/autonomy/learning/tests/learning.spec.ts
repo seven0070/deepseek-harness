@@ -43,7 +43,7 @@ describe('optimizeSkill', () => {
     const r = applyEdits('a\nb\nc', [{ op: 'replace', target: 'b', text: 'B' }, { op: 'delete', target: 'c' }, { op: 'delete', target: 'zz' }, { op: 'add', text: 'd' }])
     expect(r.skill).toBe('a\nB\nd\n')
     expect(r.applied).toHaveLength(3)
-    expect(skillOptCommand({ config: 'c.yaml', outputDir: 'out', backend: 'openai_chat' })).toContain('--backend')
+    expect(skillOptCommand({ config: 'c.yaml', backend: 'qwen_chat', cfgOptions: ['a=1'] })).toEqual(['skillopt-train', '--config', 'c.yaml', '--backend', 'qwen_chat', '--cfg-options', 'a=1'])
   })
 })
 

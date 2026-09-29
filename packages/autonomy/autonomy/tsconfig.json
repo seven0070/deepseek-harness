@@ -1,0 +1,51 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types"
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../../../vendor/schemastery"
+    },
+    {
+      "path": "../../../vendor/cordis"
+    },
+    {
+      "path": "../../core/tools"
+    },
+    {
+      "path": "../../llm/llm"
+    },
+    {
+      "path": "../autonomy-core"
+    },
+    {
+      "path": "../autonomy-prompt"
+    },
+    {
+      "path": "../efficiency"
+    },
+    {
+      "path": "../evolution"
+    },
+    {
+      "path": "../executive"
+    },
+    {
+      "path": "../learning"
+    },
+    {
+      "path": "../subjectivity"
+    },
+    {
+      "path": "../workflows"
+    },
+    {
+      "path": "../../memory/memory"
+    }
+  ]
+}

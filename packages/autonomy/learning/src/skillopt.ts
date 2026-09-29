@@ -147,15 +147,16 @@ export async function optimizeSkill<Task>(options: OptimizeOptions<Task>): Promi
 }
 
 /**
- * argv for the upstream SkillOpt CLI. Flags follow the project's documented
- * train entry point; run it on the agent's computer after `pip install skillopt`.
+ * argv for the upstream SkillOpt CLI (`skillopt-train`, installed by
+ * `pip install skillopt`; verified against 0.2.0). Output locations live in
+ * the SkillOpt config; override single keys with `cfgOptions` ("key=value").
  */
-export function skillOptCommand(options: { config: string, outputDir: string, backend?: string, extra?: string[] }): string[] {
+export function skillOptCommand(options: { config: string, backend?: string, cfgOptions?: string[], extra?: string[] }): string[] {
   return [
-    'python', '-m', 'skillopt.scripts.train',
+    'skillopt-train',
     '--config', options.config,
-    '--output_dir', options.outputDir,
     ...options.backend ? ['--backend', options.backend] : [],
+    ...options.cfgOptions?.length ? ['--cfg-options', ...options.cfgOptions] : [],
     ...options.extra ?? [],
   ]
 }

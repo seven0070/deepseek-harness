@@ -166,3 +166,10 @@ Decision: user chose **option B**. Order: B1, B2, B4 → B3 → B5 → B6. 8a (s
 ## Reference notes
 
 - `elder-plinius/CL4R1T4S` › `ANTHROPIC/Claude-Fable-5.1.md` (shared by the user): a leaked, third-party proprietary chat-product system prompt. Reviewed, but none of its text is copied into this repo, and it is not used as the agent's prompt. The dsh agent's own prompt stays in the repo's `system-prompt` packages, written in our own words.
+
+## Integration (done)
+
+- [x] `@deepseek-ai/dsh-autonomy` one-switch bundle: mounts every autonomy plugin and connects the model as planner, step worker and workflow agent.
+- [x] End-to-end test through the real LLM runtime: goal → plan → tools through authorization → verification → memory → journal and cost; an unapproved deploy is refused and the goal waits for a human.
+- [x] SkillOpt and Helix CLI calls checked against the real pip packages (SkillOpt command fixed to `skillopt-train`).
+- [ ] Live run with a real DeepSeek key (no key in this sandbox).

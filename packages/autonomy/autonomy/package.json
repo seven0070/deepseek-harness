@@ -1,0 +1,51 @@
+{
+  "name": "@deepseek-ai/dsh-autonomy",
+  "description": "One-switch autonomy bundle: mounts the safety core, memory, executive, efficiency, autonomy prompt, workflows, learning (and optionally evolution and the research layer) and wires them to the model",
+  "version": "0.2.0-rc.1",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deepseek-ai/deepseek-harness.git",
+    "directory": "packages/autonomy/autonomy"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/types/**/*.d.ts"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "workspace:~",
+    "@deepseek-ai/dsh-tools": "workspace:*",
+    "@deepseek-ai/dsh-llm": "workspace:*",
+    "@deepseek-ai/dsh-system-prompt": "workspace:*"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "workspace:~",
+    "@deepseek-ai/dsh-llm": "workspace:*",
+    "@deepseek-ai/dsh-system-prompt": "workspace:*",
+    "@deepseek-ai/dsh-tools": "workspace:*"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "workspace:~",
+    "@deepseek-ai/dsh-autonomy-core": "workspace:*",
+    "@deepseek-ai/dsh-autonomy-prompt": "workspace:*",
+    "@deepseek-ai/dsh-efficiency": "workspace:*",
+    "@deepseek-ai/dsh-evolution": "workspace:*",
+    "@deepseek-ai/dsh-executive": "workspace:*",
+    "@deepseek-ai/dsh-learning": "workspace:*",
+    "@deepseek-ai/dsh-subjectivity": "workspace:*",
+    "@deepseek-ai/dsh-workflows": "workspace:*",
+    "@deepseek-ai/dsh-memory": "workspace:*"
+  }
+}

@@ -30,6 +30,13 @@ export interface ExecutiveState {
   ticks: number
 }
 
+export interface StepEvent {
+  goal: Goal
+  step: Step
+  ok: boolean
+  text: string
+}
+
 export interface ExecutiveDeps {
   core: AutonomyCore
   memory?: MemoryService | undefined
@@ -60,12 +67,34 @@ export class ExecutiveLoop {
   private readonly breaker = new CircuitBreaker()
   private running: AbortController | undefined
 
+  private readonly stepListeners = new Set<(event: StepEvent) => void>()
+
   constructor(private readonly deps: ExecutiveDeps, state?: Partial<ExecutiveState>) {
     const now = deps.now ?? (() => new Date())
     this.goals = new GoalTree(state?.goals ?? { goals: [] }, now)
     this.world = new WorldModel(state?.world ?? { beliefs: [], predictions: [] }, { now })
     this.plans = new Map(Object.entries(state?.plans ?? {}))
     this.ticks = state?.ticks ?? 0
+  }
+
+  /** Plug in (or remove) the planner used when a goal has no plan. */
+  setPlanner(planner: ExecutiveDeps['planner']): void {
+    this.deps.planner = planner
+  }
+
+  /** Plug in (or remove) the delegate that handles free-form steps. */
+  setDelegate(delegate: ExecutiveDeps['delegate']): void {
+    this.deps.delegate = delegate
+  }
+
+  get hasPlanner(): boolean {
+    return !!this.deps.planner
+  }
+
+  /** Observe every executed step (e.g. for research measurement). Returns a disposer. */
+  onStep(listener: (event: StepEvent) => void): () => void {
+    this.stepListeners.add(listener)
+    return () => this.stepListeners.delete(listener)
   }
 
   toJSON(): ExecutiveState {
@@ -170,6 +199,7 @@ export class ExecutiveLoop {
       content: `${result.ok ? 'Succeeded' : 'Failed'}: ${step.description}${result.ok ? '' : ` — ${step.lastError}`}`,
       context: `goal ${goal.title}`,
     }]).catch(() => undefined)
+    for (const l of this.stepListeners) { try { l({ goal, step, ok: result.ok, text: result.text }) } catch {} }
     await this.checkpoint()
     return { kind: 'worked', goalId: goal.id, stepId: step.id, ok: result.ok, detail: result.text.slice(0, 500) }
   }
