@@ -133,3 +133,15 @@ describe('authorize', () => {
     return expect(decision).resolves.toMatchObject({ kind: 'denied', by: 'policy' })
   })
 })
+
+describe('consequential browser actions', () => {
+  it('need confirmation; ordinary clicks do not', async () => {
+    const { classify, DEFAULT_RULES, DEFAULT_PROTECTED } = await import('../src/authorization.ts')
+    const policy = { autoApprove: 'low' as const, rules: [...DEFAULT_RULES, { action: '*browser_*', risk: 'low' as const }], protectedPatterns: DEFAULT_PROTECTED }
+    expect(classify({ action: 'browser_click', args: { element: 'Place order button', ref: 'e12' } }, policy).risk).toBe('high')
+    expect(classify({ action: 'mcp__playwright__browser_click', args: { element: 'Delete repository' } }, policy).risk).toBe('high')
+    expect(classify({ action: 'stagehand_act', args: { instruction: 'click Buy now' } }, policy).risk).toBe('high')
+    expect(classify({ action: 'browser_click', args: { element: 'Next page link' } }, policy).risk).toBe('low')
+    expect(classify({ action: 'browser_navigate', args: { url: 'https://example.com/docs' } }, policy).risk).toBe('low')
+  })
+})

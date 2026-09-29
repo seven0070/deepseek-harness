@@ -106,6 +106,8 @@ Decision: user chose **option B**. Order: B1, B2, B4 → B3 → B5 → B6. 8a (s
 
 - [x] B1 tool ranker, B2 compression, B4 run journal + cost → `packages/autonomy/efficiency`
 - [x] B3 agent-proposed, owner-activated durable workflows → `packages/autonomy/workflows`
+- [x] B5 consequential browser / computer-use actions need confirmation → autonomy-core rules (`CONSEQUENTIAL`, `INTERACTIVE_TOOLS`)
+- [x] B6 Obsidian-compatible Markdown vault memory backend (two-way) → `packages/memory/memory` (`vault` config)
 
 ## Design principle: Open flow
 

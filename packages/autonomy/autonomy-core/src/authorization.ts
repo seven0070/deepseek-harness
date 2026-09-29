@@ -43,7 +43,24 @@ export interface RiskRule {
  * Defaults tuned to the harness's tool names. Unknown tools fall to `medium`
  * so a new capability is never silently auto-approved.
  */
+/**
+ * Words that mark a consequential browser / computer-use action — one that
+ * spends money, sends something, or destroys data. Matched against the
+ * tool's arguments (element labels, instructions, typed text, URLs).
+ * Idea from OpenHuman's "NeedsConfirmation" browser actions.
+ */
+export const CONSEQUENTIAL = '\\b(buy|purchase|checkout|check out|place (the )?order|pay( now)?|payment|subscribe|upgrade plan|donate|transfer|wire|send|submit|post|publish|tweet|reply all|delete|remove|erase|wipe|destroy|cancel (my )?(account|subscription|order)|close account|unsubscribe|confirm|accept terms|sign( and)? agree)\\b'
+
+/** Tool-name globs for browser and computer-use actions (native and MCP-prefixed). */
+export const INTERACTIVE_TOOLS: readonly string[] = [
+  '*browser_click*', '*browser_type*', '*browser_fill*', '*browser_press*', '*browser_select*', '*browser_submit*', '*browser_act*',
+  '*browser_evaluate*', '*browser_drag*', '*browser_handle_dialog*', '*browser_file_upload*',
+  '*click*', '*fill_form*', '*fill*', '*type_text*', '*press_key*', '*act', '*_act', '*computer_use*', '*left_click*', '*key_press*',
+]
+
 export const DEFAULT_RULES: readonly RiskRule[] = [
+  // Consequential browser / computer-use actions always need confirmation.
+  ...INTERACTIVE_TOOLS.map((action): RiskRule => ({ action, risk: 'high', argsMatch: CONSEQUENTIAL })),
   { action: 'read', risk: 'read' }, { action: 'grep', risk: 'read' }, { action: 'glob', risk: 'read' },
   { action: 'ls', risk: 'read' }, { action: 'web_search', risk: 'read' }, { action: 'web_fetch', risk: 'read' },
   { action: 'memory_recall', risk: 'read' }, { action: 'memory_reflect', risk: 'read' },

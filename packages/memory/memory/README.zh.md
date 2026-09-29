@@ -9,4 +9,4 @@ kind: "package"
 
 ## 概述
 
-提供 `ctx.memory`。每次保存和检索都会发送到所有已注册的后端，结果合并去重，失败或超时的后端会被跳过。内置的本地存储（关键词检索，可选保存为 JSON Lines）让智能体在没有外部服务时也能记忆。模型工具为 `memory_retain`、`memory_recall` 和 `memory_reflect`，每条记忆有一个类型：`experience`、`fact`、`self` 或 `skill`。
+提供 `ctx.memory`。每次保存和检索都会发送到所有已注册的后端，结果合并去重，失败或超时的后端会被跳过。内置的本地存储（关键词检索，可选保存为 JSON Lines）让智能体在没有外部服务时也能记忆。模型工具为 `memory_retain`、`memory_recall` 和 `memory_reflect`，每条记忆有一个类型：`experience`、`fact`、`self` 或 `skill`。设置 `vault` 为某个文件夹后，记忆还会以普通 Markdown 笔记的形式保存，可以用 Obsidian 打开：每条保存的记忆都会成为一篇带前置元数据的笔记，你自己写或修改的笔记也会被检索。

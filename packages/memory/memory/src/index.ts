@@ -21,6 +21,7 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 import { homedir } from 'node:os'
 import { LocalMemory } from './local.ts'
 import { MemoryService } from './service.ts'
+import { VaultMemory } from './vault.ts'
 import { MEMORY_KINDS } from './types.ts'
 import type { MemoryKind } from './types.ts'
 
@@ -28,6 +29,7 @@ export * from './types.ts'
 export * from './service.ts'
 export * from './local.ts'
 export * from './http.ts'
+export * from './vault.ts'
 
 declare module '@deepseek-ai/cordis' {
   interface Context {
@@ -40,6 +42,7 @@ export const name = 'memory'
 export interface Config {
   local: boolean
   localPath?: string | undefined
+  vault?: string | undefined
   timeoutMs: number
   weights: Record<string, number>
   tools: boolean
@@ -48,6 +51,7 @@ export interface Config {
 export const Config: z<Config> = z.object({
   local: z.boolean().default(true).description('Keep the built-in local store as a floor.'),
   localPath: z.string().description('JSON Lines file for the local store; omitted = in-memory only.'),
+  vault: z.string().description('Folder of Markdown notes (Obsidian-compatible) used as a two-way memory backend.'),
   timeoutMs: z.natural().default(10_000).description('Per-backend deadline for one operation.'),
   weights: z.dict(z.number().min(0)).default({}).description('Backend id → trust multiplier when merging.'),
   tools: z.boolean().default(true).description('Expose memory_* tools to the model.'),
@@ -66,6 +70,7 @@ export function apply(ctx: Context, config: Config): void {
     const path = config.localPath?.replace(/^~(?=\/|$)/, homedir())
     service.register(new LocalMemory({ path }))
   }
+  if (config.vault) service.register(new VaultMemory({ dir: config.vault.replace(/^~(?=\/|$)/, homedir()) }))
   ctx.provide('memory', service)
   // Tools mount only once a tool registry exists, so the service itself has
   // no hard dependency on it.
