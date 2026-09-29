@@ -39,6 +39,9 @@
       "path": "../../schedule/schedule"
     },
     {
+      "path": "../../autonomy/autonomy"
+    },
+    {
       "path": "../../preset/agent-preset-registry"
     },
     {

@@ -1,0 +1,13 @@
+# Experimental Autonomy over the shipped Web composition, which carries none of
+# these rows. `autonomy` mounts the whole autonomy stack (safety core, memory,
+# executive loop, efficiency, autonomy prompt, workflows, learning) with its
+# state under the Harness home and connects the agent's default model as
+# planner; `ui-autonomy` is the Autonomy page (kill switch, owner approvals,
+# goals and plan progress, latest action, spend) over that stack.
+
+- insert:
+    - id: autonomy
+      name: '@deepseek-ai/dsh-autonomy'
+
+    - id: ui-autonomy
+      name: '@deepseek-ai/dsh-client-ui-autonomy'

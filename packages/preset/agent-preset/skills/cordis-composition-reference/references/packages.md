@@ -10,6 +10,12 @@ Every package below exports a Cordis plugin that a bundle patch can name in a Lo
 |---|---|---|
 | `@deepseek-ai/dsh-acp` | yes | Automation-only Agent Client Protocol server for driving DeepSeek Harness agents over JSON-RPC stdio |
 
+## agent-computer
+
+| Package | Config | Description |
+|---|---|---|
+| `@deepseek-ai/dsh-agent-computer` | yes | The agent's own persistent computer: a dedicated Docker machine with a persistent disk, optional desktop, snapshots, and model tools |
+
 ## api
 
 | Package | Config | Description |
@@ -29,6 +35,20 @@ Every package below exports a Cordis plugin that a bundle patch can name in a Lo
 | Package | Config | Description |
 |---|---|---|
 | `@deepseek-ai/dsh-attachment-local` | yes | Private content-addressed DSH_HOME attachment storage |
+
+## autonomy
+
+| Package | Config | Description |
+|---|---|---|
+| `@deepseek-ai/dsh-autonomy` | yes | One-switch autonomy bundle: mounts the safety core, memory, executive, efficiency, autonomy prompt, workflows, learning (and optionally evolution and the research layer) and wires them to the model |
+| `@deepseek-ai/dsh-autonomy-core` | yes | Autonomy safety foundation: persistent identity and self-model, intent authorization with approval queue, budgets, kill switch, and a tamper-evident audit log |
+| `@deepseek-ai/dsh-autonomy-prompt` | yes | Autonomy system prompt: a fixed constitution for the autonomous agent plus owner-approved guidelines the agent learns and proposes while chatting |
+| `@deepseek-ai/dsh-efficiency` | yes | Efficiency: ranked tool search with a calibrated chooser, token compression of tool output, and replayable run journals with per-call cost accounting |
+| `@deepseek-ai/dsh-evolution` | yes | Whole-system evolution via Helix: sandboxed mutations on helix/* branches, evaluation gates, protected-core checks, owner-approved promotion and rollback |
+| `@deepseek-ai/dsh-executive` | yes | Executive core: goal hierarchy, world model with calibrated beliefs, plans, verification and uncertainty, recovery, and the autonomous executive loop |
+| `@deepseek-ai/dsh-learning` | yes | Learning and growth: validation-gated skill optimization (SkillOpt-style, with a SkillOpt CLI bridge), controlled experiments, and approval-gated capability acquisition |
+| `@deepseek-ai/dsh-subjectivity` | yes | Opt-in, measurement-only research layer: indicator probes associated with theories of machine consciousness (no claim that consciousness is achieved) |
+| `@deepseek-ai/dsh-workflows` | yes | Agent-proposed, owner-approved durable workflows: tool, agent, condition, approval and delay nodes; schedules; resume after pause or restart |
 
 ## boot
 
@@ -68,6 +88,7 @@ Every package below exports a Cordis plugin that a bundle patch can name in a Lo
 | `@deepseek-ai/dsh-client-ui-agent-preset` | no | Agent-preset surfaces: the default for later sessions, this session's seat, and the composition editor |
 | `@deepseek-ai/dsh-client-ui-approval` | no | Approval composer takeover over the scoped Remote Event waterfall |
 | `@deepseek-ai/dsh-client-ui-attachment` | no | Dynamic attachment presentation plugin for conversation input, message-image, and trajectory image slots |
+| `@deepseek-ai/dsh-client-ui-autonomy` | no | Autonomy page: kill switch, owner approvals, goals and plan progress, latest action, and spend |
 | `@deepseek-ai/dsh-client-ui-brand-official` | no | Official DeepSeek Harness brand occupants for the Web client's sidebar slots |
 | `@deepseek-ai/dsh-client-ui-chat` | no | Chat Conversation target, node definitions, renderers, and details surface |
 | `@deepseek-ai/dsh-client-ui-commands` | no | Client command surface: global directory cache, '/' source, three command UI kinds, popupSelect registry |
@@ -284,6 +305,7 @@ Every package below exports a Cordis plugin that a bundle patch can name in a Lo
 | `@deepseek-ai/dsh-llm-deepseek-api-key` | yes | DeepSeek api-key provider authentication and discovery |
 | `@deepseek-ai/dsh-llm-pi-ai` | yes | pi-ai-backed DeepSeek adapter for the DeepSeek Harness LLM seam (design-verification twin of dsh-llm-deepseek) |
 | `@deepseek-ai/dsh-llm-retry` | yes | Provider-routed LLM request retry policy for the DeepSeek Harness |
+| `@deepseek-ai/dsh-llm-router` | yes | Universal model routing: API-key provider auto-detection, optional live probing, and policy-based model selection over the pi-ai adapter |
 | `@deepseek-ai/dsh-plugin-package-inventory-deepseek` | yes | Active Loader-backed plugin package inventory for official DeepSeek LLM API requests |
 | `@deepseek-ai/dsh-token-meter` | yes | Replay-aware token measurement service (ctx.tokenMeter) for the DeepSeek Harness |
 
@@ -301,6 +323,14 @@ Every package below exports a Cordis plugin that a bundle patch can name in a Lo
 |---|---|---|
 | `@deepseek-ai/dsh-mcp-client` | yes | MCP client bridge: connects to MCP servers and registers their tools on ctx.tools |
 | `@deepseek-ai/dsh-mcp-resources` | no | Scoped MCP resource discovery and reading through shared model tools |
+
+## memory
+
+| Package | Config | Description |
+|---|---|---|
+| `@deepseek-ai/dsh-memory` | yes | Memory seam: one retain / recall / reflect service over pluggable backends, a built-in local backend, and model tools |
+| `@deepseek-ai/dsh-memory-cognee` | yes | Cognee memory backend (topoteretes/cognee): knowledge-graph memory over its REST API |
+| `@deepseek-ai/dsh-memory-hindsight` | yes | Hindsight memory backend (vectorize-io/hindsight): experience memory that learns, over its REST API |
 
 ## plan
 
