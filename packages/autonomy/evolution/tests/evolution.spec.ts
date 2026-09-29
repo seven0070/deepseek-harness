@@ -86,3 +86,43 @@ it('plugin: promotion is critical and needs approval; status is readable', async
   expect(await readFile(join(dir, 'app.txt'), 'utf8')).toBe('v1\n')
   await ctx.fiber.dispose()
 })
+
+describe('limitless evolution', () => {
+  it('lets protected-core mutations through only with explicit acknowledgement, and persists promotions', async () => {
+    const { dir, git } = await repo()
+    const stateFile = join(dir, '.helix', 'promotions.json')
+    const evo = new Evolution({ git, protectedPatterns: Core.DEFAULT_PROTECTED, protectedCore: 'owner-approval', stateFile })
+    const review = await evo.review('helix/sneaky')
+    expect(review).toMatchObject({ eligible: true, requiresOwnerAck: true })
+    expect(review.reason).toMatch(/PROTECTED CORE/)
+    await expect(evo.promote('helix/sneaky')).rejects.toThrow(/acknowledgeProtected/)
+    const p = await evo.promote('helix/sneaky', { acknowledgeProtected: true })
+    expect(p.protectedFiles).toEqual(['packages/autonomy/autonomy-core/src/index.ts'])
+    const reloaded = new Evolution({ git, protectedPatterns: Core.DEFAULT_PROTECTED, stateFile })
+    await reloaded.load()
+    expect(reloaded.promotions.map((x) => x.branch)).toEqual(['helix/sneaky'])
+    await reloaded.rollback()
+    expect((await git(['ls-files'])).includes('autonomy-core')).toBe(false)
+  })
+
+  it('runs unlimited generations until stopped or killed', async () => {
+    const { git } = await repo()
+    const evo = new Evolution({ git, protectedPatterns: Core.DEFAULT_PROTECTED, protectedCore: 'owner-approval' })
+    const kill = new AbortController()
+    let runs = 0
+    const driver = new Evo.LimitlessDriver({
+      evolution: evo,
+      killSignal: kill.signal,
+      async runGeneration() { runs++; if (runs === 3) kill.abort(); return 0 },
+    })
+    await driver.start()
+    expect(runs).toBe(3)
+    expect(driver.reports).toHaveLength(2) // the killed generation is not reviewed
+    expect(driver.awaitingApproval.map((r) => r.candidate.branch).sort()).toEqual(['helix/good', 'helix/sneaky'])
+    expect(driver.running).toBe(false)
+
+    const capped = new Evo.LimitlessDriver({ evolution: evo, maxGenerations: 2, runGeneration: async () => 0 })
+    await capped.start()
+    expect(capped.generation).toBe(2)
+  })
+})

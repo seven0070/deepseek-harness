@@ -137,4 +137,10 @@ could produce properties associated with machine consciousness, **without assumi
 - [x] **Phase 4 — Executive core**: `packages/autonomy/autonomy-core` (identity + versioned self-model, risk-classified authorization gate on every tool call, approval queue, protected immutable core, budgets, kill switch incl. `STOP` file, hash-chained audit log) and `packages/autonomy/executive` (goal hierarchy, world model with log-odds beliefs/decay/calibration, plan DAGs, verification checks, retries + circuit breaker, autonomous loop with memory recall/retain; goal_/plan_/belief_ tools).
 - [x] **Phase 5 — Learning**: `packages/autonomy/learning` (SkillOpt-style validation-gated skill optimizer + upstream CLI bridge, statistical `experiment_run` on the agent computer, propose → test → owner-approved install pipeline for new skills/scripts).
 - [x] **Phase 6 — Evolution**: `packages/autonomy/evolution` (Helix bridge: helix.toml + gate evaluator emitting HELIX_RESULT, background runs on helix/* branches, protected-core diff check, fresh-worktree re-evaluation, critical-risk owner-approved merge, revert rollback).
+  - [x] **Limitless evolution** (user request): `mode: limitless` — unlimited generations (`maxGenerations: 0`), whole-repo mutation scope including the protected core; promotion always owner-approved (critical risk), protected-core changes also need `acknowledgeProtected`; kill switch stops the loop; promotion history persisted for rollback.
 - [x] **Phase 7 — Subjectivity research layer**: `packages/autonomy/subjectivity` (opt-in, off by default, measurement-only; metacognition calibration, self-model stability, global-workspace availability, agency indicators; every report disclaims any consciousness claim).
+
+
+## Reference notes
+
+- `elder-plinius/CL4R1T4S` › `ANTHROPIC/Claude-Fable-5.1.md` (shared by the user): a leaked, third-party proprietary chat-product system prompt. Reviewed, but none of its text is copied into this repo, and it is not used as the agent's prompt. The dsh agent's own prompt stays in the repo's `system-prompt` packages, written in our own words.

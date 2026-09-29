@@ -13,6 +13,9 @@
  * @module dsh-evolution/promotion
  */
 
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { dirname } from 'node:path'
+
 export type Git = (args: readonly string[]) => Promise<string>
 
 export interface Candidate {
@@ -28,7 +31,18 @@ export interface Promotion {
   previousHead: string
   mergedHead: string
   score?: number | undefined
+  protectedFiles: string[]
   at: string
+}
+
+export interface Review {
+  candidate: Candidate
+  violations: string[]
+  score?: number | undefined
+  eligible: boolean
+  /** Touches the protected core; promotable only with explicit owner acknowledgement. */
+  requiresOwnerAck: boolean
+  reason: string
 }
 
 export class Evolution {
@@ -40,9 +54,31 @@ export class Evolution {
     /** Runs the evaluator in the candidate's tree; returns its score. */
     evaluate?: ((branch: string) => Promise<number | undefined>) | undefined
     minScore?: number | undefined
+    /**
+     * `refuse` (default): candidates touching the protected core are never
+     * eligible. `owner-approval`: they are eligible, but promotion requires an
+     * explicit acknowledgement on top of the critical-risk owner approval.
+     */
+    protectedCore?: 'refuse' | 'owner-approval' | undefined
     branchPrefix?: string | undefined
     now?: () => Date
+    /** Persist promotion history so rollback survives restarts. */
+    stateFile?: string | undefined
   }) {}
+
+  async load(): Promise<void> {
+    if (!this.options.stateFile) return
+    try {
+      const saved = JSON.parse(await readFile(this.options.stateFile, 'utf8')) as Promotion[]
+      this.promotions.splice(0, this.promotions.length, ...saved)
+    } catch {}
+  }
+
+  private async save(): Promise<void> {
+    if (!this.options.stateFile) return
+    await mkdir(dirname(this.options.stateFile), { recursive: true })
+    await writeFile(this.options.stateFile, JSON.stringify(this.promotions, null, 2))
+  }
 
   private get prefix(): string {
     return this.options.branchPrefix ?? 'helix/'
@@ -79,30 +115,40 @@ export class Evolution {
    * Check a candidate without changing anything. Caller must separately
    * obtain owner approval before calling {@link promote}.
    */
-  async review(branch: string): Promise<{ candidate: Candidate, violations: string[], score?: number | undefined, eligible: boolean, reason: string }> {
+  async review(branch: string): Promise<Review> {
     const candidate = (await this.candidates()).find((c) => c.branch === branch)
     if (!candidate) throw new Error(`evolution: no candidate branch ${branch}`)
     const violations = this.violations(candidate)
-    if (violations.length) return { candidate, violations, eligible: false, reason: `touches the protected core: ${violations.join(', ')}` }
-    if (!candidate.files.length) return { candidate, violations, eligible: false, reason: 'no changes' }
+    const ownerOnly = violations.length > 0
+    if (ownerOnly && this.options.protectedCore !== 'owner-approval') {
+      return { candidate, violations, eligible: false, requiresOwnerAck: false, reason: `touches the protected core: ${violations.join(', ')}` }
+    }
+    if (!candidate.files.length) return { candidate, violations, eligible: false, requiresOwnerAck: ownerOnly, reason: 'no changes' }
     const score = await this.options.evaluate?.(branch)
     const min = this.options.minScore ?? 0
     if (this.options.evaluate && (score === undefined || score <= min)) {
-      return { candidate, violations, score, eligible: false, reason: `evaluation score ${score ?? 'missing'} is not above ${min}` }
+      return { candidate, violations, score, eligible: false, requiresOwnerAck: ownerOnly, reason: `evaluation score ${score ?? 'missing'} is not above ${min}` }
     }
-    return { candidate, violations, score, eligible: true, reason: 'passes protected-core check and evaluation gate' }
+    return {
+      candidate, violations, score, eligible: true, requiresOwnerAck: ownerOnly,
+      reason: ownerOnly ? `passes the evaluation gate; MODIFIES THE PROTECTED CORE (${violations.join(', ')}) — owner acknowledgement required` : 'passes protected-core check and evaluation gate',
+    }
   }
 
-  async promote(branch: string): Promise<Promotion> {
+  async promote(branch: string, options: { acknowledgeProtected?: boolean | undefined } = {}): Promise<Promotion> {
     const review = await this.review(branch)
     if (!review.eligible) throw new Error(`evolution: ${branch} is not eligible — ${review.reason}`)
+    if (review.requiresOwnerAck && !options.acknowledgeProtected) {
+      throw new Error(`evolution: ${branch} modifies the protected core (${review.violations.join(', ')}); promotion needs acknowledgeProtected with owner approval`)
+    }
     const git = this.options.git
     if ((await git(['status', '--porcelain'])).trim()) throw new Error('evolution: working tree is not clean')
     const previousHead = (await git(['rev-parse', 'HEAD'])).trim()
     await git(['merge', '--no-ff', '-m', `evolution: promote ${branch}${review.score !== undefined ? ` (score ${review.score})` : ''}`, branch])
     const mergedHead = (await git(['rev-parse', 'HEAD'])).trim()
-    const p: Promotion = { branch, previousHead, mergedHead, score: review.score, at: (this.options.now?.() ?? new Date()).toISOString() }
+    const p: Promotion = { branch, previousHead, mergedHead, score: review.score, protectedFiles: review.violations, at: (this.options.now?.() ?? new Date()).toISOString() }
     this.promotions.push(p)
+    await this.save()
     return p
   }
 
@@ -112,6 +158,7 @@ export class Evolution {
     if (!last) throw new Error('evolution: nothing to roll back')
     await this.options.git(['revert', '--no-edit', '-m', '1', last.mergedHead])
     this.promotions.pop()
+    await this.save()
     return last
   }
 }

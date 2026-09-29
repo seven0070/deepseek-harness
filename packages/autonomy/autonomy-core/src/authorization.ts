@@ -62,6 +62,7 @@ export const DEFAULT_RULES: readonly RiskRule[] = [
   { action: 'skill_promote', risk: 'high' }, { action: 'capability_install', risk: 'high' },
   { action: 'evolution_status', risk: 'read' }, { action: 'evolution_review', risk: 'low' },
   { action: 'evolution_start', risk: 'high' }, { action: 'evolution_rollback', risk: 'high' },
+  { action: 'evolution_autorun', risk: 'high' },
   { action: 'evolution_promote', risk: 'critical' },
 ]
 
