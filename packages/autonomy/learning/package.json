@@ -1,0 +1,42 @@
+{
+  "name": "@deepseek-ai/dsh-learning",
+  "description": "Learning and growth: validation-gated skill optimization (SkillOpt-style, with a SkillOpt CLI bridge), controlled experiments, and approval-gated capability acquisition",
+  "version": "0.2.0-rc.1",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deepseek-ai/deepseek-harness.git",
+    "directory": "packages/autonomy/learning"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/types/**/*.d.ts"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "workspace:~",
+    "@deepseek-ai/dsh-autonomy-core": "workspace:*",
+    "@deepseek-ai/dsh-tools": "workspace:*"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "workspace:~",
+    "@deepseek-ai/dsh-autonomy-core": "workspace:*",
+    "@deepseek-ai/dsh-llm": "workspace:*",
+    "@deepseek-ai/dsh-system-prompt": "workspace:*",
+    "@deepseek-ai/dsh-tools": "workspace:*"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "workspace:~"
+  }
+}
